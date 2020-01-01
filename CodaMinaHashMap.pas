@@ -28,11 +28,13 @@ type
       end;
       TNodelist=array of pHashNode;
     private
-    table:TNodelist;
-    size:integer;
-    modCount:integer;
-    threshold:integer;
-    loadFactor:double;
+      table:TNodelist;
+      size:integer;
+      modCount:integer;
+      threshold:integer;
+      loadFactor:double;
+      freelist:PhashNode;
+      procedure freeNode(p:phashnode);
     protected
      function GetValue(const Key:TKey):TValue;
      procedure SetValue(const Key:TKey;const Value:TValue);
@@ -59,6 +61,7 @@ type
       procedure   clear();
       function    capacity():integer;
       procedure  add(const Key:TKey;const Value:TValue);
+      procedure destroy();
       property Values[const Key:TKey]:TValue read GetValue write SetValue; default;
     end;
 implementation
@@ -408,7 +411,10 @@ implementation
       result := default(TValue);
       e:= removeNode(gethashvalue(key), key, default(Tvalue), false, true);
       if e <> nil then
+      begin
         result:=e^.v;
+        freeNode(e);
+      end;
     end;
 
     function TCodaMinaHashMap.removeNode(hash:integer;key:TKey;value:TValue;matchValue,movable:boolean):phashnode;
@@ -483,6 +489,7 @@ implementation
     procedure TCodaMinaHashMap.clear();
     var
       tab:TNodeList;
+      p:phashnode;
       i:integer;
     begin
       modCount:=modCount+1;
@@ -491,10 +498,34 @@ implementation
       begin
         size := 0;
         for i := 0 to length(tab)-1 do
+        begin
+          if tab[i] <> nil then
+          begin
+            p:=tab[i]^.next;
+            while (p<>nil) do
+            begin
+              freeNode(p);
+              p:=tab[i]^.next;
+            end;
+            freeNode(tab[i]);
+          end;
           tab[i] := nil;
+        end;
       end;
     end;
-
+    procedure TCodaMinaHashMap.destroy();
+    var
+      p:phashnode;
+    begin
+      clear();
+      while freelist<>nil do
+      begin
+        p:=freelist;
+        freelist:=freelist^.next;
+        dispose(p);
+      end;
+      setlength(table,0);
+    end;
     function  TCodaMinaHashMap.containsValue( value:Tvalue):boolean;
     var
       tab:TNodeList;
@@ -539,11 +570,32 @@ implementation
     var
       p:phashnode;
     begin
-      p:=new(phashnode);
-      p^.hash := hash;
-      p^.K:=key;
-      p^.V:=value;
-      p^.next:=next;
-      result := p;
+      if freelist<>nil then
+      begin
+        result:=freelist;
+        freelist:=freelist^.next;
+      end
+      else
+      begin
+        p:=new(phashnode);
+        p^.hash := hash;
+        p^.K:=key;
+        p^.V:=value;
+        p^.next:=next;
+        result := p;
+      end;
     end;
+    procedure TCodaMinaHashMap.freeNode(p:phashnode);
+    begin
+      p^.next:=nil;
+      p^.hash:=0;
+      if freelist<>nil then
+      begin
+        freelist^.next:=p;
+      end
+      else
+      begin
+        freelist:=p;
+      end;
+    end;    
 end.
