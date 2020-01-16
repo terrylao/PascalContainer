@@ -41,7 +41,7 @@ begin
         size  :=size * 2
       else
         size  :=4;
-      setlength(nodes,size * sizeof (TQueueNode));
+      setlength(nodes,size);
     end;
     i := len + 1;
     j := i div 2;
