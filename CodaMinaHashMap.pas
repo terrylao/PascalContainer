@@ -567,8 +567,6 @@ implementation
     end;
 
     function TCodaMinaHashMap.newNode(hash:integer; Key:Tkey;value:Tvalue; next:phashnode):phashnode;
-    var
-      p:phashnode;
     begin
       if freelist<>nil then
       begin
@@ -577,13 +575,12 @@ implementation
       end
       else
       begin
-        p:=new(phashnode);
-        p^.hash := hash;
-        p^.K:=key;
-        p^.V:=value;
-        p^.next:=next;
-        result := p;
+        result := =new(phashnode);
       end;
+      result^.hash := hash;
+      result^.K:=key;
+      result^.V:=value;
+      result^.next:=next;
     end;
     procedure TCodaMinaHashMap.freeNode(p:phashnode);
     begin
