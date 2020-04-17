@@ -575,7 +575,7 @@ implementation
       end
       else
       begin
-        result := =new(phashnode);
+        result := new(phashnode);
       end;
       result^.hash := hash;
       result^.K:=key;
