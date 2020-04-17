@@ -2,6 +2,7 @@
   publish with BSD Licence.
 	Copyright (c) Terry Lao
 }
+ {$mode ObjFPC}{$H+}
 unit CodaMinaHashMap;
 interface
 uses murmur3,math;
