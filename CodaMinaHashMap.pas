@@ -74,7 +74,6 @@ implementation
     begin
       if TypeInfo(key) = TypeInfo(string) then
       begin
-        ////writeln('it is string!!');
 	len:=length(pstring(@key)^); 
         data:=pbyte(key);
         //pcrd:=@data[-8];
