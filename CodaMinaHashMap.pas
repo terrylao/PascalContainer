@@ -62,7 +62,7 @@ type
       procedure   clear();
       function    capacity():integer;
       procedure  add(const Key:TKey;const Value:TValue);
-      procedure destroy();
+      destructor destroy();
       property Values[const Key:TKey]:TValue read GetValue write SetValue; default;
     end;
 implementation
@@ -514,7 +514,7 @@ implementation
         end;
       end;
     end;
-    procedure TCodaMinaHashMap.destroy();
+    destructor TCodaMinaHashMap.destroy();
     var
       p:phashnode;
     begin
