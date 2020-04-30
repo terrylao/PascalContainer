@@ -9,7 +9,7 @@ priority queue,
 red-black-Tree,
 AVL-tree,
 Quad-Tree,
-SlipList,
+SkipList,
 LockFreeQueue.
 基本上都夠用的。
 
