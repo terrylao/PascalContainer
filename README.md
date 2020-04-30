@@ -1,5 +1,17 @@
 # PascalContainer
-generic pascal data structure with B-Tree,B+Tree,B*Tree,T-Tree,HashMap and priority queue.
+generic pascal data structure with 
+B-Tree,
+B+Tree,
+B*Tree,
+T-Tree,
+HashMap,
+priority queue, 
+red-black-Tree,
+AVL-tree,
+Quad-Tree,
+SlipList,
+LockFreeQueue.
+基本上都夠用的。
 
 以BSD LICENSE 發佈
 BSD開源協議是一個給於使用者很大自由的協議。基本上使用者可以"為所欲為",可以自由的使用，修改源代碼，也可以將修改後的代碼作為開源或者專有軟件再發佈。
