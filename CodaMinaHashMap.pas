@@ -585,15 +585,11 @@ implementation
     end;
     procedure TCodaMinaHashMap.freeNode(p:phashnode);
     begin
-      p^.next:=nil;
       p^.hash:=0;
       if freelist<>nil then
       begin
-        freelist^.next:=p;
-      end
-      else
-      begin
-        freelist:=p;
+        p^.next:=freelist;
       end;
+      freelist:=p;
     end;    
 end.
