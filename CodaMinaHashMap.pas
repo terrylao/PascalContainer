@@ -589,6 +589,10 @@ implementation
       if freelist<>nil then
       begin
         p^.next:=freelist;
+      end
+      else
+      begin
+      	p^.next:=nil;
       end;
       freelist:=p;
     end;    
