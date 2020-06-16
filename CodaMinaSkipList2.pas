@@ -1,4 +1,4 @@
-unit CodaMinaSkipList2;
+unit CodaMinaLockFreeSkipList2;
 
 interface
 {$mode ObjFPC}{$H+}
@@ -12,7 +12,7 @@ const
 
 type
 
-  generic TCodaMinaSkipList<TKEY,TValue>=class
+  generic TCodaMinaLockFreeSkipList<TKEY,TValue>=class
   type
     cmp_func=function(key1, key2:TKEY):integer;
     PNode = ^TNode;
@@ -28,7 +28,7 @@ type
 
     FCurrent: PNode;
     cmpf:cmp_func;
-    function MakeNode(lvl, Value: TValue):PNode;
+    function MakeNode(lvl:integer;key:TKey; Value: TValue):PNode;
     function RandomLevel: Integer;
     procedure DeleteNode(var x: PNode);
     function GetEOF: Boolean;
@@ -49,21 +49,24 @@ type
 
 implementation
 
-{ TCodaMinaSkipList }
-procedure TCodaMinaSkipList.setCompareFunction(c:cmp_func);
+{ TCodaMinaLockFreeSkipList }
+procedure TCodaMinaLockFreeSkipList.setCompareFunction(c:cmp_func);
 begin
   cmpf:=c;
 end;
-constructor TCodaMinaSkipList.Create(c:cmp_func);
+constructor TCodaMinaLockFreeSkipList.Create(c:cmp_func);
+var
+  i:integer;
 begin
-  FHead := MakeNode(1, -MaxInt);
-  FTail := MakeNode(1, MaxInt);
-  FHead^.Next[0] := FTail;
-  FLevel  := 1;
+  FHead := MakeNode(1, default(TKey),default(TValue));
+  FTail := MakeNode(1, default(TKey),default(TValue));
+  for i:=0 to MaxLevel-1 do
+    FHead^.Next[i] := FTail;
+  FLevel  := MaxLevel;
   cmpf:=c;
 end;
 
-procedure TCodaMinaSkipList.Delete(AKey: TKey);
+procedure TCodaMinaLockFreeSkipList.Delete(AKey: TKey);
 var
   i: Integer;
   x: PNode;
@@ -97,18 +100,18 @@ begin
   end;
 end;
 
-procedure TCodaMinaSkipList.DeleteNode(var x: PNode);
+procedure TCodaMinaLockFreeSkipList.DeleteNode(var x: PNode);
 begin
   SetLength(x^.next, 0);
   Dispose(x);
 end;
 
-procedure TCodaMinaSkipList.First;
+procedure TCodaMinaLockFreeSkipList.First;
 begin
   FCurrent := FHead^.Next[0];
 end;
 
-destructor TCodaMinaSkipList.Destroy;
+destructor TCodaMinaLockFreeSkipList.Destroy;
 var
   x: PNode;
 begin
@@ -125,12 +128,12 @@ begin
   inherited Destroy;
 end;
 
-function TCodaMinaSkipList.GetEOF: Boolean;
+function TCodaMinaLockFreeSkipList.GetEOF: Boolean;
 begin
   Result := FCurrent^.Key = MaxInt;
 end;
 
-procedure TCodaMinaSkipList.Insert(AKey: TKey;const NewValue: Tvalue);
+procedure TCodaMinaLockFreeSkipList.Insert(AKey: TKey;const NewValue: Tvalue);
 var
   i, lvl: Integer;
   x: PNode;
@@ -148,12 +151,13 @@ begin
   end;
 
   x := x^.Next[0];
-  if cmpf(x^.Key , AKey)=0 then
+  if (x<>nil) and (cmpf(x^.Key , AKey)=0) then
      x^.Data := NewValue
-  else begin
+  else 
+  begin
     lvl := RandomLevel;
 
-    x := MakeNode(lvl, AKey);
+    x := MakeNode(lvl, AKey,NewValue);
     x^.Data := NewValue;
 
     if lvl > FLevel then
@@ -176,7 +180,7 @@ begin
   end;
 end;
 
-function TCodaMinaSkipList.MakeNode(lvl, Value: TValue):PNode;
+function TCodaMinaLockFreeSkipList.MakeNode(lvl:integer;key:TKey; Value: TValue):PNode;
 var
   i: Integer;
 begin
@@ -184,22 +188,23 @@ begin
   SetLength(Result^.Next, lvl);
   for i:= 0 to lvl - 1 do
     Result^.Next[i] := nil;
-  Result^.Key := Value;
+  Result^.Key := key;
+  Result^.data := Value;
 end;
 
-procedure TCodaMinaSkipList.Next;
+procedure TCodaMinaLockFreeSkipList.Next;
 begin
   FCurrent := FCurrent^.Next[0];
 end;
 
-function TCodaMinaSkipList.RandomLevel: Integer;
+function TCodaMinaLockFreeSkipList.RandomLevel: Integer;
 begin
   Result := 1;
   while (Random(100)/100 < p) and (Result < MaxLevel) do
     Inc(Result);
 end;
 
-function TCodaMinaSkipList.Search(Akey: TKEY;var outValue:TValue): boolean;
+function TCodaMinaLockFreeSkipList.Search(Akey: TKEY;var outValue:TValue): boolean;
 var
   i: Integer;
   x: PNode;
@@ -222,7 +227,7 @@ begin
   result:=true;
 end;
 
-function TCodaMinaSkipList.Value: TValue;
+function TCodaMinaLockFreeSkipList.Value: TValue;
 begin
   if FCurrent <> nil then
     Result := FCurrent^.Data
