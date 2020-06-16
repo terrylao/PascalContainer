@@ -130,7 +130,7 @@ end;
 
 function TCodaMinaLockFreeSkipList.GetEOF: Boolean;
 begin
-  Result := FCurrent^.Key = MaxInt;
+  Result := FCurrent^.Key = Default(TKey);
 end;
 
 procedure TCodaMinaLockFreeSkipList.Insert(AKey: TKey;const NewValue: Tvalue);
