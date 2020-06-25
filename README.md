@@ -1,8 +1,8 @@
 # PascalContainer
 generic pascal data structure with <br/>
 B-Tree,<br/>
-B+Tree,<br/>
-B*Tree,<br/>
+B+-Tree,<br/>
+B*-Tree,<br/>
 T-Tree,<br/>
 HashMap,<br/>
 priority queue, <br/>
