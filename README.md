@@ -10,8 +10,12 @@ red-black-Tree,
 AVL-tree,
 Quad-Tree,
 SkipList,
+Sortable Single Linklist,
+Sort Function,
 LockFreeQueue.
 基本上都夠用的。
+
+-O3 10M integer, DualPivotQuickSort 1680 > quicksort3PivotBasic 1700 > quicksort 1770 > IterativequickSort 1800 > mergesort 2260 >  Iterativemergesort 3120
 
 以BSD LICENSE 發佈
 BSD開源協議是一個給於使用者很大自由的協議。基本上使用者可以"為所欲為",可以自由的使用，修改源代碼，也可以將修改後的代碼作為開源或者專有軟件再發佈。
