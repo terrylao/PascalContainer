@@ -17,7 +17,7 @@ LockFreeQueue.<br/>
 Sort function 的測試：<br/>
 測試參數： -O3<br/>
 測試量：10M integer<br/> 
-測試結果：DualPivotQuickSort 1680 > quicksort3PivotBasic 1700 > quicksort 1770 > IterativequickSort 1800 > mergesort 2260 >  Iterativemergesort 3120<br/>
+測試結果：DualPivotQuickSort 1680ms > quicksort3PivotBasic 1700ms > quicksort 1770ms > IterativequickSort 1800ms > mergesort 2260ms >  Iterativemergesort 3120ms。<br/>
 generic QuickSort 與非 generic 的慢約500ms ，<br/>與 C 同樣開 -O3 的比，慢約100ms。
 
 
