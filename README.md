@@ -18,7 +18,8 @@ Sort function 的測試：<br/>
 測試參數： -O3<br/>
 測試量：10M integer<br/> 
 測試結果：DualPivotQuickSort 1680ms > quicksort3PivotBasic 1700ms > quicksort 1770ms > IterativequickSort 1800ms > mergesort 2260ms >  Iterativemergesort 3120ms。<br/>
-generic QuickSort 與非 generic 的慢約500ms ，<br/>與 C 同樣開 -O3 的比，慢約100ms。
+generic QuickSort 與非 generic 的慢約500ms ，<br/>
+非generic Quicksort 的 FPC 與 GCC 同樣開 -O3 ，FPC 慢約100ms。<br/>
 
 
 
