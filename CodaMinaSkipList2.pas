@@ -2,7 +2,7 @@
   publish with BSD Licence.
 	Copyright (c) Terry Lao
 }
-unit CodaMinaLockFreeSkipList2;
+unit CodaMinaSkipList2;
 
 interface
 {$mode ObjFPC}{$H+}

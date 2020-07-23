@@ -8,8 +8,8 @@ uses
   {$ENDIF}{$ENDIF}
   Classes, SysUtils,
   CodaMinaHashMap,CodaMinaPriorityQueue,
-  CodaMinaTTree,CodaMinaBTree,CodaMinaBPlusTree,CodaMinaBStarTree,CodaMinaSkipList2,CodaMinaConcurrentHashMap
-  ,avltree, CodaMinaAVLTree,CodaMinaRBTree,CodaMinaQuadtree,CodaMinalockfreeQueue,genericCodaMinaSortableLink,genericCodaMinaSort;
+  CodaMinaTTree,CodaMinaBTree,CodaMinaBPlusTree,CodaMinaBStarTree,CodaMinaSkipList2
+  ,CodaMinaAVLTree,CodaMinaRBTree,CodaMinaQuadtree,CodaMinalockfreeQueue,genericCodaMinaSortableLink,genericCodaMinaSort;
 type
   ahashmap=specialize TCodaMinaHashMap<string,integer>;
   bhashmap=specialize TCodaMinaHashMap<string,string>;
@@ -21,9 +21,6 @@ type
   ibptree   =specialize TCodaMinaBPlusTree<Integer,Integer>;
   ibstree   =specialize TCodaMinaBStarTree<Integer,Integer>;
   TCMHM = specialize TCodaMinaHashMap<string, integer>;
-  iskiplist=specialize TCodaMinaSkipList<integer,integer>;
-  cciHash=specialize TCodaMinaConcurrentHashMap<Integer,Integer>;
-  iavl=specialize TAVLTree<Integer,Integer>;
   icavl=specialize TCodaMinaAVLTree<Integer>;
   irbtree= specialize TCodaMinaRBTree<Integer>;
   sqdtree= specialize TCodaMinaQuadTree<string>;
@@ -72,49 +69,6 @@ begin
        writeln(stdout,'thread done.');
   //end;
 end;
-type
-  TThreadHash = class(TThread)
-  private
-    ahash:cciHash;
-    r:int32;
-  protected
-    procedure Execute; override;
-  public
-    constructor Create(hash:cciHash);
-    destructor Destroy; override;
-  end;
-  constructor TThreadHash.Create(hash:cciHash);
-  begin
-    inherited Create(true);
-    ahash:=hash;
-    freeonterminate:=true;
-    r:=Random(10000);
-  end;
-  destructor TThreadHash.Destroy;
-  begin
-    inherited;
-  end;
-  procedure TThreadHash.Execute;
-  var
-    i:integer;
-  begin
-
-    //while not Terminated do
-    //begin
-         writeln(stdout,self.ThreadID,'=thread start:',r);
-         for i:=r to r+10 do
-         begin
-              aHash.put(i,i);
-         end;
-         writeln(stdout,self.ThreadID,'=thread put done');
-         for i:=r to r+10 do
-         begin
-              writeln(stdout,self.ThreadID,'=get',i);
-              aHash.get(i);
-         end;
-         writeln(stdout,'thread done.');
-    //end;
-  end;
 
 procedure hashmaptest;
 var
@@ -191,12 +145,12 @@ begin
    NTickInitial:= GetTickCount64;
    for i:=0 to iindex do
    begin
-     mybstree.searchNodeInsert(datas[i],datas[i]+1);
+     mybstree.add(datas[i],datas[i]+1);
    end;
    //mybstree.printtree();
    for i:=0 to iindex do
    begin
-     if mybstree.search(datas[i])<>datas[i]+1 then
+     if mybstree.find(datas[i])<>datas[i]+1 then
      begin
           writeln(StdOut,'search fail:',datas[i]);
           break;
@@ -223,12 +177,12 @@ begin
    NTickInitial:= GetTickCount64;
    for i:=0 to iindex do
    begin
-     mybptree.searchNodeInsert(datas[i],datas[i]+1);
+     mybptree.add(datas[i],datas[i]+1);
    end;
    //mybptree.printtree();
    for i:=0 to iindex do
    begin
-     if mybptree.search(datas[i])<>datas[i]+1 then
+     if mybptree.find(datas[i])<>datas[i]+1 then
      begin
           writeln(StdOut,'search fail:',datas[i]);
           break;
@@ -253,12 +207,12 @@ begin
    NTickInitial:= GetTickCount64;
    for i:=0 to iindex do
    begin
-     mybtree.searchNodeInsert(datas[i],datas[i]+1);
+     mybtree.add(datas[i],datas[i]+1);
    end;
    //mybtree.printtree();
    for i:=0 to iindex do
    begin
-     if mybtree.search(datas[i])<>datas[i]+1 then
+     if mybtree.find(datas[i])<>datas[i]+1 then
      begin
           writeln(StdOut,'search fail:',datas[i]);
           break;
@@ -428,10 +382,6 @@ var
    i:integer;
    NTickInitial,NTickShowEnd: QWord;
    cm: TCMHM;
-   sList :  iskiplist;
-   accihash:cciHash;
-   hashthread:TThreadHash;
-   aiavl:iavl;
    biavl:icavl;
    airbtree:irbtree;
    queuethread:TThreadQueue;

@@ -78,16 +78,16 @@ type
       function getOpside(side:TNODETYPE):TNODETYPE;
       procedure freeNode(n:ptreenode);
       function getEmptyNode():ptreenode;
+      procedure printTreeNode(tnode:ptreenode;offs:integer);
     protected
       attree:TtreeRec;
       emptyHead:ttreenode;
     public
       constructor create(cmpf:ttree_cmp_func;np:tnode_print_func;recordcount:integer);   
-      procedure printTreeNode(tnode:ptreenode;offs:integer);
       procedure printtree();
-      function search(key:TKEY):TVALUE;
+      function Find(key:TKEY):TVALUE;
       function delete(key:TKEY):boolean;
-      function searchNodeInsert(key:TKEY;value:Tvalue):boolean;
+      function Add(key:TKEY;value:Tvalue):boolean;
   end;
   
 implementation
@@ -453,7 +453,7 @@ begin
   aTTree.keys_are_unique := true;
   emptyHead.successor:=nil;
 end;
-function TCodaMinaTTree.search(key:TKEY):TVALUE;
+function TCodaMinaTTree.Find(key:TKEY):TVALUE;
 var
   n:ptreeNode;
   cmp_res, idx, c,i:integer;
@@ -787,7 +787,7 @@ step 2. copy N2's key (except first ) into N3(after first)
     LEAF[130](0)    LEAF[150,153,157](0)
 }
 
-function TCodaMinaTTree.searchNodeInsert(key:TKEY;value:Tvalue):boolean;
+function TCodaMinaTTree.Add(key:TKEY;value:Tvalue):boolean;
 var
   n,parent:ptreeNode;
   cmp_res, idx, i:integer;
@@ -795,7 +795,7 @@ var
   tmpkey:tkey;
   item:TVALUE;
 begin
-  {$ifdef debug}writeln(stdout,'searchNodeInsert:',key);{$endif}
+  {$ifdef debug}writeln(stdout,'Add:',key);{$endif}
   side:= TNODE_BOUND;
   item := default(TVALUE);
   n := aTTree.root;

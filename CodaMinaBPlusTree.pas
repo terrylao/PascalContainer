@@ -39,12 +39,12 @@ type
       procedure freeANode(n:pBPNodeRec);
       function getFreeNode(isleaf:boolean):pBPNodeRec;
       procedure rangeAppendToNode(frompos,topos:integer;nfrom,nto:pBPNodeRec);
+      procedure printTreeNode(n:pBPNodeRec;offs:integer);
     public
       constructor create(cmpf:ttree_cmp_func;recordcount:integer;capacity:integer=10);
-      function search(key:TKEY):TVALUE;
+      function Find(key:TKEY):TVALUE;
       function delete(key:TKEY):boolean;
-      function searchNodeInsert(key:TKEY;value:Tvalue):boolean;
-      procedure printTreeNode(n:pBPNodeRec;offs:integer);
+      function Add(key:TKEY;value:Tvalue):boolean;
       procedure printtree();
 	end;
 implementation
@@ -94,7 +94,7 @@ begin
   
   result^.max:=0;
 end;
-function TCodaMinaBPlusTree.searchNodeInsert(key:TKEY;value:Tvalue):boolean;
+function TCodaMinaBPlusTree.Add(key:TKEY;value:Tvalue):boolean;
 var
   n,n1,n2,prior,prior2:pBPNodeRec;
   i,j,k:integer;
@@ -431,7 +431,7 @@ procedure TCodaMinaBPlusTree.printtree();
 begin
   printTreeNode(bpTree.root, 0);
 end;
-function TCodaMinaBPlusTree.search(key:TKEY):TVALUE;
+function TCodaMinaBPlusTree.Find(key:TKEY):TVALUE;
 var
   n:pBPNodeRec;
   i:integer;

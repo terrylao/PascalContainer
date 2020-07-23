@@ -44,7 +44,7 @@ type
     function Add(Data: T): PAVLNode;
     procedure Clear;
     function Find(Data: T): PAVLNode;
-    procedure Remove(Data: T);
+    procedure delete(Data: T);
     procedure printTree();
     property Count: Integer read FCount;
   end;
@@ -640,7 +640,7 @@ begin
   else
     Root := Successor;
   // delete Node as usual
-  Delete(ANode);
+  DeleteNode(ANode);
 end;
 
 function TCodaMinaAVLTree.Find(Data: T): PAVLNode;
@@ -727,13 +727,13 @@ begin
   end;
 end;
 
-procedure TCodaMinaAVLTree.Remove(Data: T);
+procedure TCodaMinaAVLTree.delete(Data: T);
 var
   ANode: PAVLNode;
 begin
   ANode := Find(Data);
   if ANode <> nil then
-    Delete(ANode);
+    DeleteNode(ANode);
 end;
 
 procedure TCodaMinaAVLTree.printTreeNode(n:PAVLNode; offs:integer);

@@ -47,12 +47,12 @@ type
       function getFreeNode():pBNodeRec;
       procedure setupRelative(parentkeypos,parentlinkpos:integer;n:pBNodeRec;var siblingside,unclekeypos:integer;var sibling,cousin:pBNodeRec);
       procedure split2NodeInsertv2(n,n2,child,child2:pBNodeRec;var key:TKEY;var value:Tvalue);
+      procedure printTreeNode(n:pBNodeRec;offs:integer);
     public
       constructor create(cmpf:ttree_cmp_func;recordcount:integer;capacity:integer=10);
-      function search(key:TKEY):TVALUE;
+      function Find(key:TKEY):TVALUE;
       function delete(key:TKEY):boolean;
-      function searchNodeInsert(key:TKEY;value:Tvalue):boolean;
-      procedure printTreeNode(n:pBNodeRec;offs:integer);
+      function Add(key:TKEY;value:Tvalue):boolean;
       procedure printtree();
 	end;
 implementation
@@ -91,7 +91,7 @@ begin
   result^.isleaf:=1;
   result^.max:=0;
 end;
-function TCodaMinaBStarTree.searchNodeInsert(key:TKEY;value:Tvalue):boolean;
+function TCodaMinaBStarTree.Add(key:TKEY;value:Tvalue):boolean;
 var
   n,n1,n2,n3,prior,prior1,prior2,prior3:pBNodeRec;
   i,j,childpos,parentpos,siblingpos,checkpos:integer;
@@ -808,7 +808,7 @@ procedure TCodaMinaBStarTree.printtree();
 begin
   printTreeNode(BStarTree.root, 0);
 end;
-function TCodaMinaBStarTree.search(key:TKEY):TVALUE;
+function TCodaMinaBStarTree.Find(key:TKEY):TVALUE;
 var
   n:pBNodeRec;
   i:integer;
