@@ -262,7 +262,8 @@ implementation
             begin
               p^.next := newNode(hash, key, value, nil);
               break;
-            end;
+            end
+	    else
             if (e^.hash = hash) then
             begin
               k := e^.k;
