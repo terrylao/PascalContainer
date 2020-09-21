@@ -41,7 +41,7 @@ type
      procedure SetValue(const Key:TKey;const Value:TValue);
     public
       resizecount,collisioncount,slotcount:UInt32;
-      binoccupied,slotoccupied,longestBinCount,avgBinLength:Uint32;
+      binoccupied,slotoccupied,longestBinCount:Uint32;
       function    gethashvalue(key:Tkey):integer;
       function    tableSizeFor(cap:integer):integer;
       constructor Create(initialCapacity:integer;aloadFactor:double);
@@ -65,6 +65,7 @@ type
       function    capacity():integer;
       procedure  add(const Key:TKey;const Value:TValue);
       destructor destroy();
+      function getAvgBinCount():Uint32;
       property Values[const Key:TKey]:TValue read GetValue write SetValue; default;
     end;
 implementation
@@ -128,7 +129,6 @@ implementation
         binoccupied:=0;
         resizecount:=0;
         longestBinCount:=0;
-        avgBinLength:=0;
         slotoccupied:=0;
     end;
 
@@ -185,7 +185,12 @@ implementation
     begin
         put(Key, Value);
     end;
-
+    function TCodaMinaHashMap.getAvgBinCount:Uint32;
+    begin
+      result:=1;
+      if binoccupied>0 then
+        result:=size div binoccupied;
+    end;
     function TCodaMinaHashMap.getNode(hash:integer; key:TKey):phashnode;
     var
       first,e:phashnode;
@@ -303,8 +308,6 @@ implementation
         end;
       end;
       size:=size+1;
-      if binoccupied>0 then
-        avgBinLength:=size div binoccupied;
       if (size > threshold) then
           resize();
       result := default(TValue);
