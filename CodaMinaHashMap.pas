@@ -29,9 +29,9 @@ type
       end;
       TNodelist=array of pHashNode;
     private
+
       table:TNodelist;
       size:integer;
-      modCount:integer;
       threshold:integer;
       loadFactor:double;
       freelist:PhashNode;
@@ -40,6 +40,8 @@ type
      function GetValue(const Key:TKey):TValue;
      procedure SetValue(const Key:TKey;const Value:TValue);
     public
+      resizecount,collisioncount,slotcount:UInt32;
+      binoccupied,slotoccupied,longestBinCount,avgBinLength:Uint32;
       function    gethashvalue(key:Tkey):integer;
       function    tableSizeFor(cap:integer):integer;
       constructor Create(initialCapacity:integer;aloadFactor:double);
@@ -123,6 +125,11 @@ implementation
         else
           loadFactor := aloadFactor;
         threshold := tableSizeFor(initialCapacity);
+        binoccupied:=0;
+        resizecount:=0;
+        longestBinCount:=0;
+        avgBinLength:=0;
+        slotoccupied:=0;
     end;
 
     constructor TCodaMinaHashMap.Create(initialCapacity:integer);
@@ -197,6 +204,7 @@ implementation
               exit(first);
             end;
           end;
+          inc(collisioncount);
           e := first^.next;
           if (e <> nil) then 
           begin
@@ -209,6 +217,7 @@ implementation
                 end;
               end;
               e := e^.next;
+              inc(collisioncount);
             until (e = nil);
           end;
         end;
@@ -244,6 +253,7 @@ implementation
       if p=nil then
       begin
         table[i] := newNode(hash, key, value, nil);
+        slotoccupied:=slotoccupied+1;
       end
       else
       begin
@@ -255,24 +265,32 @@ implementation
         else
         begin
           binCount := 0;
+          inc(collisioncount);
+          binoccupied:=binoccupied+1;
           while (true) do
           begin
             e := p^.next;
+            
             if (e = nil) then
             begin
               p^.next := newNode(hash, key, value, nil);
               break;
             end
-	    else
+            else
             if (e^.hash = hash) then
             begin
               k := e^.k;
               if (k = key) then
                 break;
             end;
+            inc(collisioncount);
             p := e;
             binCount:=binCount+1;
           end;
+        end;
+        if longestBinCount<binCount then
+        begin
+          longestBinCount:=binCount;
         end;
         if (e <> nil) then
         begin // existing mapping for key
@@ -284,8 +302,9 @@ implementation
           exit(oldValue);
         end;
       end;
-      modCount:=modCount+1;
       size:=size+1;
+      if binoccupied>0 then
+        avgBinLength:=size div binoccupied;
       if (size > threshold) then
           resize();
       result := default(TValue);
@@ -302,6 +321,8 @@ implementation
       oldCap := length(oldTab);
       oldThr := threshold;
       newThr := 0;
+      inc(resizecount);
+      collisioncount:=0;
       if (oldCap > 0) then
       begin
         if (oldCap >= MAXIMUM_CAPACITY) then
@@ -340,6 +361,7 @@ implementation
       end;
       threshold := newThr;
       table:=nil;
+      slotcount:=newCap;
       SetLength(table,newCap);
       if (oldCap > 0) then
       begin
@@ -361,6 +383,7 @@ implementation
               hiHead := nil;
               hiTail := nil;
               repeat
+                inc(collisioncount);
                 next := e^.next;
                 if ((e^.hash and oldCap) = 0) then
                 begin
@@ -478,7 +501,6 @@ implementation
                 begin
                     p^.next := node^.next;
                 end;
-                modCount:=modCount+1;
                 size:=size-1;
                 exit(node);
               end;
@@ -494,7 +516,6 @@ implementation
       p:phashnode;
       i:integer;
     begin
-      modCount:=modCount+1;
       tab := table;
       if (tab <> nil) and (size > 0) then
       begin
