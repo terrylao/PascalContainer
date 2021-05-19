@@ -64,7 +64,7 @@ type
       procedure   clear();
       function    capacity():integer;
       procedure  add(const Key:TKey;const Value:TValue);
-      destructor destroy();
+      destructor destroy();override;
       function getAvgBinCount():Uint32;
       property Values[const Key:TKey]:TValue read GetValue write SetValue; default;
     end;
@@ -516,7 +516,7 @@ implementation
     procedure TCodaMinaHashMap.clear();
     var
       tab:TNodeList;
-      p:phashnode;
+      p,n:phashnode;
       i:integer;
     begin
       tab := table;
@@ -528,10 +528,12 @@ implementation
           if tab[i] <> nil then
           begin
             p:=tab[i]^.next;
-            while (p<>nil) do
+	    n:=p;
+            while (n<>nil) do
             begin
+	      n:=p^.next;
               freeNode(p);
-              p:=tab[i]^.next;
+              p:=n;
             end;
             freeNode(tab[i]);
           end;
