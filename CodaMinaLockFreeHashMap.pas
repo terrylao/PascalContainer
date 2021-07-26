@@ -487,7 +487,7 @@ implementation
 				Freemem(oldTab,oldCap*sizeOf(pHashNode));
 			end;
 		end;
-
+//this function not thread safe
     function TCodaMinaLockFreeHashMap.remove(key:TKey):TValue;
     var
       e:phashnode;
@@ -570,7 +570,7 @@ implementation
       end;
       result := nil;
     end;
-
+//this function not thread safe
     procedure TCodaMinaLockFreeHashMap.clear();
     var
       tab:TNodeList;
