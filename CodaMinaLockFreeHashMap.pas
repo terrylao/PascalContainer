@@ -275,6 +275,7 @@ implementation
       n,i,binCount:UInt32;
       K:TKEY;
       oldValue,d:TValue;
+			ltable:TNodelist;
     begin
       if (currentcapacity=0) or (size > threshold) or (resizing>0) then
       begin
@@ -289,13 +290,14 @@ implementation
 				relocateChunks();
 				resizing:=0;
       end;
-      d:=default(TValue);
+      ltable:=table;
       n:=currentcapacity;
       i := ((n - 1)  and hash) ;
-      p := table[ i];
+      p := ltable[ i];
+			d:=default(TValue);
       if p=nil then
       begin
-        table[i] := newNode(hash, key, value, nil);
+        ltable[i] := newNode(hash, key, value, nil);
       end
       else
       begin
