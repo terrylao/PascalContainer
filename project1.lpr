@@ -3,9 +3,9 @@ program project1;
 {$mode objfpc}{$H+}
 
 uses
-  {$IFDEF UNIX}{$IFDEF UseCThreads}
+  {$IFDEF UNIX}
   cthreads,
-  {$ENDIF}{$ENDIF}
+  {$ENDIF}
   Classes, SysUtils,
   CodaMinaHashMap,CodaMinaPriorityQueue,
   CodaMinaTTree,CodaMinaBTree,CodaMinaBPlusTree,CodaMinaBStarTree,CodaMinaSkipList2
