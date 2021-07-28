@@ -1,7 +1,5 @@
 # PascalContainer project specific
-/lib
-project1
-project1.exe
+/bin
 
 # Compiled l10n files: .mo should be ignored
 *.mo
