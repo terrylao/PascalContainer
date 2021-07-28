@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
-  <Package Version="5">
+  <Package Version="4">
     <Name Value="PascalContainer"/>
     <Type Value="RunTimeOnly"/>
     <Author Value="Terry Lao"/>
@@ -13,77 +13,72 @@
     </CompilerOptions>
     <Description Value="Object Pascal Data Structures: B-Tree,B+Tree,B*Tree,T-Tree,HashMap"/>
     <Version Minor="1" Build="1"/>
-    <Files>
-      <Item>
+    <Files Count="16">
+      <Item1>
         <Filename Value="../src/CodaMinaAVLTree.pas"/>
         <UnitName Value="CodaMinaAVLTree"/>
-      </Item>
-      <Item>
+      </Item1>
+      <Item2>
         <Filename Value="../src/CodaMinaBPlusTree.pas"/>
         <UnitName Value="CodaMinaBPlusTree"/>
-      </Item>
-      <Item>
+      </Item2>
+      <Item3>
         <Filename Value="../src/CodaMinaBStarTree.pas"/>
         <UnitName Value="CodaMinaBStarTree"/>
-      </Item>
-      <Item>
+      </Item3>
+      <Item4>
         <Filename Value="../src/CodaMinaBTree.pas"/>
         <UnitName Value="CodaMinaBTree"/>
-      </Item>
-      <Item>
+      </Item4>
+      <Item5>
         <Filename Value="../src/CodaMinaHashMap.pas"/>
         <UnitName Value="CodaMinaHashMap"/>
-      </Item>
-      <Item>
+      </Item5>
+      <Item6>
         <Filename Value="../src/CodaMinaLockFreeHashMap.pas"/>
         <UnitName Value="CodaMinaLockFreeHashMap"/>
-      </Item>
-      <Item>
+      </Item6>
+      <Item7>
         <Filename Value="../src/CodaMinalockfreeQueue.pas"/>
         <UnitName Value="CodaMinalockfreeQueue"/>
-      </Item>
-      <Item>
+      </Item7>
+      <Item8>
         <Filename Value="../src/CodaMinaPriorityQueue.pas"/>
         <UnitName Value="CodaMinaPriorityQueue"/>
-      </Item>
-      <Item>
+      </Item8>
+      <Item9>
         <Filename Value="../src/CodaMinaQuadtree.pas"/>
         <UnitName Value="CodaMinaQuadtree"/>
-      </Item>
-      <Item>
+      </Item9>
+      <Item10>
         <Filename Value="../src/CodaMinaRBTree.pas"/>
         <UnitName Value="CodaMinaRBTree"/>
-      </Item>
-      <Item>
+      </Item10>
+      <Item11>
         <Filename Value="../src/CodaMinaSkipList.pas"/>
         <UnitName Value="CodaMinaSkipList"/>
-      </Item>
-      <Item>
+      </Item11>
+      <Item12>
         <Filename Value="../src/CodaMinaSkipList2.pas"/>
         <UnitName Value="CodaMinaSkipList2"/>
-      </Item>
-      <Item>
+      </Item12>
+      <Item13>
         <Filename Value="../src/CodaMinaTTree.pas"/>
         <UnitName Value="CodaMinaTTree"/>
-      </Item>
-      <Item>
+      </Item13>
+      <Item14>
         <Filename Value="../src/genericCodaMinaSort.pas"/>
         <UnitName Value="genericCodaMinaSort"/>
-      </Item>
-      <Item>
+      </Item14>
+      <Item15>
         <Filename Value="../src/genericCodaMinaSortableLink.pas"/>
         <UnitName Value="genericCodaMinaSortableLink"/>
-      </Item>
-      <Item>
+      </Item15>
+      <Item16>
         <Filename Value="../src/murmur3.pas"/>
         <UnitName Value="murmur3"/>
-      </Item>
+      </Item16>
     </Files>
-    <RequiredPkgs>
-      <Item>
-        <PackageName Value="FCL"/>
-      </Item>
-    </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>
     </UsageOptions>
