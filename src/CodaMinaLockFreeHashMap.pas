@@ -3,6 +3,7 @@
 	Copyright (c) Terry Lao
 }
 unit CodaMinaLockFreeHashMap;
+{$mode objfpc}{$H+}{$modeswitch advancedrecords}
 interface
 uses murmur3,math,SyncObjs,sysutils;
 
@@ -32,6 +33,19 @@ type
         next:PhashNode;
       end;
       TNodelist=^PHashNode;
+      THashIterator = record
+    		type
+     	    ahashmap=specialize TCodaMinaLockFreeHashMap<TKey,TValue>;	 
+        private
+          FHash: ahashmap;
+          FCurrent: ahashmap.PkeyPair;
+    			globalindex:INTEGER;
+    			globalPhashNode:ahashmap.PhashNode;
+        public 
+          function Next: Boolean;
+    			procedure Reset;
+          property Current: ahashmap.PkeyPair read FCurrent;
+      end;
     private
     table:TNodelist;
     size:UInt32;
@@ -55,10 +69,11 @@ type
       function    getNode(hash:UInt32; key:TKey):phashnode;
       function    removeNode(hash:UInt32;key:TKey;value:TValue;matchValue,movable:boolean):phashnode;
       function    tableSizeFor(cap:UInt32):UInt32;
+			function loopNext(k:PKeyPair;var startindex:integer;var startphash:PhashNode):boolean;
     public
       resizecount,collisioncount,slotcount:UInt32;
       binoccupied,slotoccupied,longestBinCount:Uint32;
-      procedure startLoop();
+
       function    gethashvalue(key:Tkey):UInt32;
       
       constructor Create(initialCapacity:Int32;aloadFactor:double;lScavenger:TClearFunc=nil);
@@ -79,8 +94,8 @@ type
       procedure   clear();
       function    capacity():UInt32;
       procedure  add(const Key:TKey;const Value:TValue);
-      function loopNext(k:PKeyPair):boolean;
       destructor destroy();override;
+			function GetIterator: THashIterator;
       function getAvgBinCount():Uint32;
 			function GetCollisionRatio():double;
       property Values[const Key:TKey]:TValue read GetValue write SetValue; default;
@@ -88,7 +103,22 @@ type
 			property Slots:UInt32 read capacity;
     end;
 implementation
+    function TCodaMinaLockFreeHashMap.THashIterator.Next: Boolean;
+    begin
+      Result := FHash.loopNext(FCurrent,globalindex,globalPhashNode);
+    end;
 
+    procedure TCodaMinaLockFreeHashMap.THashIterator.Reset;
+		begin
+       globalindex:=0;
+       globalPhashNode:=nil;
+		end;
+		
+    function TCodaMinaLockFreeHashMap.GetIterator: THashIterator;
+    begin
+      Result.FHash:=self;
+      Result.reset();
+    end;
     function TCodaMinaLockFreeHashMap.gethashvalue(key:Tkey):UInt32;
     var
       data:pbyte;
@@ -310,8 +340,8 @@ implementation
         else
         begin
           binCount := 0;
-          inc(collisioncount);
-          binoccupied:=binoccupied+1;
+          InterlockedIncrement(collisioncount);
+          InterlockedIncrement(binoccupied);
           while (true) do
           begin
             e := p^.next;
@@ -335,8 +365,8 @@ implementation
                 break;
             end;
             p := e;
-            inc(collisioncount);
-            binCount:=binCount+1;
+            InterlockedIncrement(collisioncount);
+            InterlockedIncrement(binCount);
           end;
         end;
         if longestBinCount<binCount then
@@ -353,7 +383,7 @@ implementation
           exit(oldValue);
         end;
       end;
-      modCount:=modCount+1;
+			InterlockedIncrement(modCount);
       InterlockedIncrement(size);
       result := default(TValue);
     end;
@@ -487,7 +517,7 @@ implementation
 				Freemem(oldTab,oldCap*sizeOf(pHashNode));
 			end;
 		end;
-//this function not thread safe
+
     function TCodaMinaLockFreeHashMap.remove(key:TKey):TValue;
     var
       e:phashnode;
@@ -560,8 +590,8 @@ implementation
                 begin
                     p^.next := node^.next;
                 end;
-                modCount:=modCount+1;
-                size:=size-1;
+                InterlockedIncrement(modCount);
+                InterlockedDecrement(size);
                 exit(node);
               end;
             end;
@@ -570,14 +600,14 @@ implementation
       end;
       result := nil;
     end;
-//this function not thread safe
+
     procedure TCodaMinaLockFreeHashMap.clear();
     var
       tab:TNodeList;
       p,n:phashnode;
       i:UInt32;
     begin
-      modCount:=modCount+1;
+      InterlockedIncrement(modCount);
       tab := table;
       if (tab <> nil) and (size > 0) then
       begin
@@ -614,13 +644,8 @@ implementation
       freemem(table);
 			inherited;
     end;
-    procedure TCodaMinaLockFreeHashMap.startLoop();
-    begin
-         globalindex:=0;
-         globalPhashNode:=nil;
-    end;
 
-    function TCodaMinaLockFreeHashMap.loopNext(k:PKeyPair):boolean;
+    function TCodaMinaLockFreeHashMap.loopNext(k:PKeyPair;var startindex:integer;var startphash:PhashNode):boolean;
     var
       tab:TNodeList;
       i:UInt32;
@@ -629,29 +654,29 @@ implementation
       result:=false;
       if (tab <> nil) and (size > 0) then
       begin
-        for i := globalindex to currentcapacity-1 do
+        for i := startindex to currentcapacity-1 do
         begin
           if tab[i] <> nil then
           begin
-            if globalPhashNode=nil then
+            if startphash=nil then
             begin
               k^.K:=tab[i]^.K;
               k^.V:=tab[i]^.V;
-              globalPhashNode:=tab[i]^.next;
-              if globalPhashNode=nil then
-                 globalindex:=i+1
+              startphash:=tab[i]^.next;
+              if startphash=nil then
+                 startindex:=i+1
               else
-                  globalindex:=i;
+                  startindex:=i;
               result:=true;
               exit;
             end
             else
             begin
-              k^.K:=globalPhashNode^.K;
-              k^.V:=globalPhashNode^.V;
-              globalPhashNode:=globalPhashNode^.next;
-              if globalPhashNode=nil then
-	              globalindex:=globalindex+1;
+              k^.K:=startphash^.K;
+              k^.V:=startphash^.V;
+              startphash:=startphash^.next;
+              if startphash=nil then
+	              startindex:=startindex+1;
               result:=true;
               exit;
             end;
