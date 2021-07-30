@@ -8,7 +8,7 @@ uses
   {$ENDIF}
   Classes, SysUtils,
   CodaMinaHashMap,CodaMinaPriorityQueue,
-  CodaMinaTTree,CodaMinaBTree,CodaMinaBPlusTree,CodaMinaBStarTree,CodaMinaSkipList2
+  CodaMinaTTree,CodaMinaBTree,CodaMinaBPlusTree,CodaMinaBStarTree,CodaMinaSkipList2,CodaMinaLockFreeHashMap
   ,CodaMinaAVLTree,CodaMinaRBTree,CodaMinaQuadtree,CodaMinalockfreeQueue,genericCodaMinaSortableLink,genericCodaMinaSort;
 type
   ahashmap=specialize TCodaMinaHashMap<string,integer>;
@@ -75,6 +75,8 @@ var
 hashmap:ahashmap;
 shashmap:bhashmap;
 sihashmap:ihashmap;
+Iterator:shashmap.THashIterator;
+keypair:shashmap.TkeyPair;
 begin
     //my hashmap test
     hashmap:=ahashmap.Create;
@@ -92,6 +94,12 @@ begin
     writeln(stdout,'Two=',shashmap.GetValue('Two'));
     writeln(stdout,'Four=',hashmap.GetValue('Four'));
     writeln(stdout,'1030570=',sihashmap.GetValue(1030570));
+    Iterator:=shashmap.GetIterator;
+    while Iterator.Next do
+    begin
+      keypair:=Iterator.Current;
+      writeln(stdout,'shashmap key=',keypair.K,' value=',keypair.V);
+    end;
     sihashmap.destroy();
 end;
 function cmp(a,b:integer):integer;
