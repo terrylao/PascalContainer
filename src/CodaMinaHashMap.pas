@@ -2,7 +2,7 @@
   publish with BSD Licence.
 	Copyright (c) Terry Lao
 }
- {$mode ObjFPC}{$H+}
+ {$mode ObjFPC}{$H+}{$modeswitch advancedrecords}
 unit CodaMinaHashMap;
 interface
 uses murmur3,math;
@@ -20,6 +20,12 @@ type
      generic TCodaMinaHashMap<TKey, TValue>=class
     
     type
+      TClearFunc = procedure (AValue: TValue);
+      PKeyPair=^TkeyPair;
+      TkeyPair=record
+        K:TKEY;
+        V:TValue;
+      end;
       PhashNode=^THashNode;
       THashNode=record
         hash:Integer;
@@ -28,39 +34,61 @@ type
         next:PhashNode;
       end;
       TNodelist=array of pHashNode;
+      THashIterator = record
+    		type
+     	    ahashmap=specialize TCodaMinaHashMap<TKey,TValue>;
+        private
+          FHash: ahashmap;
+          FCurrent: ahashmap.TkeyPair;
+    			globalindex:INTEGER;
+    			globalPhashNode:ahashmap.PhashNode;
+        public 
+          function Next: Boolean;
+    			procedure Reset;
+          property Current: ahashmap.TkeyPair read FCurrent;
+      end;
     private
 
       table:TNodelist;
       size:integer;
       threshold:integer;
       loadFactor:double;
-      freelist:PhashNode;
-      procedure freeNode(p:phashnode);
+      
+      
     protected
-     function GetValue(const Key:TKey):TValue;
-     procedure SetValue(const Key:TKey;const Value:TValue);
+		  freelist:PhashNode;
+		  Scavenger:TClearFunc;
+      function GetValue(const Key:TKey):TValue;
+      procedure SetValue(const Key:TKey;const Value:TValue);
+  		procedure freeNode(p:phashnode);
+  		function    newNode(hash:integer; Key:Tkey;value:Tvalue; next:phashnode):phashnode;
+			function    putVal(hash:integer; Key:Tkey; value:Tvalue; onlyIfAbsent,evict:boolean):TValue;
+			function    removeNode(hash:integer;key:TKey;value:TValue;matchValue,movable:boolean):phashnode;
+			function    getNode(hash:integer; key:TKey):phashnode;
+			function    tableSizeFor(cap:integer):integer;
+			function loopNext(k:PKeyPair;var startindex:integer;var startphash:PhashNode):boolean;
     public
       resizecount,collisioncount,slotcount:UInt32;
       binoccupied,slotoccupied,longestBinCount:Uint32;
       function    gethashvalue(key:Tkey):integer;
-      function    tableSizeFor(cap:integer):integer;
-      constructor Create(initialCapacity:integer;aloadFactor:double);
-      constructor Create(initialCapacity:integer);
-      constructor Create();
+      
+      constructor Create(initialCapacity:integer;aloadFactor:double;lScavenger:TClearFunc=nil);
+      constructor Create(initialCapacity:integer;lScavenger:TClearFunc=nil);
+      constructor Create(lScavenger:TClearFunc=nil);
       function    getsize():integer;
       function    isEmpty():boolean;
       function    TryGetValue(const Key:TKey;out v:TValue):boolean;
       function    get(K:Tkey):TValue;
-      function    getNode(hash:integer; key:TKey):phashnode;
+      
       function    containsKey(key:Tkey):boolean;
       function    put(K:Tkey; V:Tvalue):Tvalue;
-      function    putVal(hash:integer; Key:Tkey; value:Tvalue; onlyIfAbsent,evict:boolean):TValue;
+      
       procedure    resize();
       function    remove(key:TKey):TValue;
-      function    removeNode(hash:integer;key:TKey;value:TValue;matchValue,movable:boolean):phashnode;
+      
       function    containsValue( value:Tvalue):boolean;
       function    getloadFactor():double;
-      function    newNode(hash:integer; Key:Tkey;value:Tvalue; next:phashnode):phashnode;
+      function GetIterator: THashIterator;
       procedure   clear();
       function    capacity():integer;
       procedure  add(const Key:TKey;const Value:TValue);
@@ -69,6 +97,22 @@ type
       property Values[const Key:TKey]:TValue read GetValue write SetValue; default;
     end;
 implementation
+    function TCodaMinaHashMap.THashIterator.Next: Boolean;
+    begin
+      Result := FHash.loopNext(@FCurrent,globalindex,globalPhashNode);
+    end;
+
+    procedure TCodaMinaHashMap.THashIterator.Reset;
+		begin
+       globalindex:=0;
+       globalPhashNode:=nil;
+		end;
+		
+    function TCodaMinaHashMap.GetIterator: THashIterator;
+    begin
+      Result.FHash:=self;
+      Result.reset();
+    end;
     function TCodaMinaHashMap.gethashvalue(key:Tkey):integer;
     var
       data:pbyte;
@@ -77,17 +121,15 @@ implementation
     begin
       if TypeInfo(key) = TypeInfo(string) then
       begin
-	len:=length(pstring(@key)^); 
+        len:=length(pstring(@key)^); 
         data:=pbyte(key);
-        //pcrd:=@data[-8];
-        //len  := pcrd[0];
       end
       else
       begin
         len  := sizeof(TKey);
         data := @key;
       end;
-      result:=MurmurHash3_x86_32(data,len,17943);//120ms
+      result:=MurmurHash3_x86_32(data,len,17943);
       if result<0 then
       begin
         result:=result*-1;
@@ -115,7 +157,7 @@ implementation
       result := n + 1;
     end;
 
-    constructor TCodaMinaHashMap.Create(initialCapacity:integer;aloadFactor:double);
+    constructor TCodaMinaHashMap.Create(initialCapacity:integer;aloadFactor:double;lScavenger:TClearFunc);
     begin
         if (initialCapacity < 0) then
             initialCapacity := DEFAULT_INITIAL_CAPACITY;
@@ -130,18 +172,19 @@ implementation
         resizecount:=0;
         longestBinCount:=0;
         slotoccupied:=0;
+				Scavenger:=lScavenger;
     end;
 
-    constructor TCodaMinaHashMap.Create(initialCapacity:integer);
+    constructor TCodaMinaHashMap.Create(initialCapacity:integer;lScavenger:TClearFunc);
     begin
-      Create(initialCapacity, DEFAULT_LOAD_FACTOR);
+      Create(initialCapacity, DEFAULT_LOAD_FACTOR,lScavenger);
     end;
 
-    constructor TCodaMinaHashMap.Create();
+    constructor TCodaMinaHashMap.Create(lScavenger:TClearFunc);
     begin
       loadFactor := DEFAULT_LOAD_FACTOR; // all other fields defaulted
       threshold := tableSizeFor(DEFAULT_INITIAL_CAPACITY);
-      Create(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR);
+      Create(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR,lScavenger);
     end;
 
     function TCodaMinaHashMap.getsize():integer;
@@ -554,6 +597,45 @@ implementation
       end;
       setlength(table,0);
     end;
+    function TCodaMinaHashMap.loopNext(k:PKeyPair;var startindex:integer;var startphash:PhashNode):boolean;
+    var
+      tab:TNodeList;
+      i:UInt32;
+    begin
+      tab := table;
+      result:=false;
+      if (tab <> nil) and (size > 0) then
+      begin
+        for i := startindex to length(table)-1 do
+        begin
+          if tab[i] <> nil then
+          begin
+            if startphash=nil then
+            begin
+              k^.K:=tab[i]^.K;
+              k^.V:=tab[i]^.V;
+              startphash:=tab[i]^.next;
+              if startphash=nil then
+                 startindex:=i+1
+              else
+                  startindex:=i;
+              result:=true;
+              exit;
+            end
+            else
+            begin
+              k^.K:=startphash^.K;
+              k^.V:=startphash^.V;
+              startphash:=startphash^.next;
+              if startphash=nil then
+	              startindex:=startindex+1;
+              result:=true;
+              exit;
+            end;
+          end;
+        end;
+      end;
+    end;
     function  TCodaMinaHashMap.containsValue( value:Tvalue):boolean;
     var
       tab:TNodeList;
@@ -613,13 +695,17 @@ implementation
     procedure TCodaMinaHashMap.freeNode(p:phashnode);
     begin
       p^.hash:=0;
+			if Scavenger<>nil then
+			begin
+			  Scavenger(p^.V);
+			end;
       if freelist<>nil then
       begin
         p^.next:=freelist;
       end
       else
       begin
-      	p^.next:=nil;
+        p^.next:=nil;
       end;
       freelist:=p;
     end;    
