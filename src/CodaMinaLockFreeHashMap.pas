@@ -38,13 +38,13 @@ type
      	    ahashmap=specialize TCodaMinaLockFreeHashMap<TKey,TValue>;	 
         private
           FHash: ahashmap;
-          FCurrent: ahashmap.PkeyPair;
+          FCurrent: ahashmap.TkeyPair;
     			globalindex:INTEGER;
     			globalPhashNode:ahashmap.PhashNode;
         public 
           function Next: Boolean;
     			procedure Reset;
-          property Current: ahashmap.PkeyPair read FCurrent;
+          property Current: ahashmap.TkeyPair read FCurrent;
       end;
     private
     table:TNodelist;
@@ -56,8 +56,7 @@ type
     resizing,freememowner:UInt32;
 		oldTab:TNodelist;
     protected
-      globalindex:INTEGER;
-      globalPhashNode,freelist:PhashNode;
+      freelist:PhashNode;
       Scavenger:TClearFunc;
       function GetValue(const Key:TKey):TValue;
       procedure SetValue(const Key:TKey;const Value:TValue);
@@ -105,7 +104,7 @@ type
 implementation
     function TCodaMinaLockFreeHashMap.THashIterator.Next: Boolean;
     begin
-      Result := FHash.loopNext(FCurrent,globalindex,globalPhashNode);
+      Result := FHash.loopNext(@FCurrent,globalindex,globalPhashNode);
     end;
 
     procedure TCodaMinaLockFreeHashMap.THashIterator.Reset;
