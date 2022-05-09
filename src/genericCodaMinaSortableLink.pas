@@ -10,6 +10,7 @@ uses Classes, SysUtils,math;
 TYPE
   generic TCodaMinaSortableLink<T>=class
   type
+    TClearFunc = procedure (AValue: T);
     tCompFunc = function(A,B:T):integer;
     ppnode = ^pnode;
     pnode = ^noderec;
@@ -20,6 +21,8 @@ TYPE
   private
     head,tail,cur:pnode;
     cmp:tCompFunc;
+    Scavenger:TClearFunc;
+    printer:TClearFunc;
   protected
     function SortedMerge(a, b:pnode):pnode;
     procedure FrontBackSplit(source:pnode; frontRef, backRef:ppnode);
@@ -30,7 +33,7 @@ TYPE
     function IterativeMergeSort(list:pnode;is_circular,is_double:integer):pnode;
     procedure swap(a,b:pnode);
   public
-    constructor create(compare:tCompFunc);
+    constructor create(compare:tCompFunc=nil;lScavenger:TClearFunc=nil;lprint:TClearFunc=nil);
     destructor destroy();
     procedure add(val:T);
     procedure LockFreeadd(val:T);
@@ -43,23 +46,46 @@ TYPE
 implementation
 
 
-constructor TCodaMinaSortableLink.create(compare:tCompFunc);
+constructor TCodaMinaSortableLink.create(compare:tCompFunc=nil;lScavenger:TClearFunc=nil;lprint:TClearFunc=nil);
 begin
   head:=nil;
   tail:=nil;
-  cur:=nil;
+  pool:=nil;
+  count:=0;
   cmp:=compare;
+  Scavenger:= lScavenger;
+  printer:=lprint;
 end;
 destructor TCodaMinaSortableLink.destroy();
 var
   tmp:pnode;
 begin
+  clear();
   while head<>nil do
   begin
     tmp:=head;
     head:=head^.next;
     freemem(tmp);
   end;
+  inherited;
+end;
+procedure TCodaMinaSortableLink.clear();
+var
+  tmp:pnode;
+begin
+  if Scavenger<>nil then
+	begin
+    while head<>nil do
+    begin
+      tmp:=head;
+      head:=head^.next;
+      Scavenger(tmp^.data);
+    end;
+	end;
+  pool:=head;
+  head:=nil;
+  tail:=nil;
+  count:=0;
 end;
 function TCodaMinaSortableLink.starIterative():T;
 begin
@@ -372,7 +398,7 @@ procedure TCodaMinaSortableLink.printList(node:pnode);
 begin
   while (node <> nil) do
   begin
-    write(stdout,node^.data); 
+    printer(node^.data);
     node := node^.next; 
   end;
 end;
