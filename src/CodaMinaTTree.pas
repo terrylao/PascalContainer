@@ -30,6 +30,7 @@ type
   
   generic TCodaMinaTTree<TKEY,TVALUE>=class
     type
+      TClearFunc=procedure (value:TVALUE);
       ttree_cmp_func=function(key1, key2:TKEY):integer;
       
       ptreeNode=^TtreeNode;
@@ -45,6 +46,7 @@ type
         keys_are_unique:boolean;//* The field is true if keys in a tree supposed to be unique
         cmp_func:ttree_cmp_func;
         printfn:tnode_print_func;
+	Scavenger:TClearFunc;
       end;
       TtreeNode=record
         parent:ptreeNode;     //*< Pointer to node's parent }
@@ -83,7 +85,7 @@ type
       attree:TtreeRec;
       emptyHead:ttreenode;
     public
-      constructor create(cmpf:ttree_cmp_func;np:tnode_print_func;recordcount:integer);   
+      constructor create(cmpf:ttree_cmp_func;np:tnode_print_func;recordcount:integer;lScavenger:TClearFunc=nil);
       procedure printtree();
       function Find(key:TKEY):TVALUE;
       function delete(key:TKEY):boolean;
@@ -444,11 +446,12 @@ goout:
     end;
 end;
 
-constructor TCodaMinaTTree.create(cmpf:ttree_cmp_func;np:tnode_print_func;recordcount:integer);
+constructor TGenericTTree.create(cmpf:ttree_cmp_func;np:tnode_print_func;recordcount:integer;lScavenger:TClearFunc=nil);
 begin
   aTTree.root := nil;
   aTTree.keys_per_tnode := recordcount;
   aTTree.cmp_func := cmpf;
+	aTTree.Scavenger:=lScavenger;
   aTTree.printfn:=np;
   aTTree.keys_are_unique := true;
   emptyHead.successor:=nil;
@@ -1070,6 +1073,13 @@ begin
   //make a link for store all empty treenode;
   n^.left :=nil;
   n^.right:=nil;
+	if aTTree.Scavenger<>nil then
+	begin
+    for i:=0 to length(n^.data)-1 do
+    begin
+			aTTree.Scavenger(n^.data[i]);
+    end;
+	end;
   if (emptyHead.successor<>nil) then
     n^.parent:=emptyHead.successor
   else
