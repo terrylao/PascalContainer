@@ -11,6 +11,7 @@ Type
  
   generic TCodaMinaRBTree<T> = class
   Type
+    TClearFunc = procedure (AValue: TValue);
     TCompareFunc = function( a, b: T): Integer;
     PRBNode = ^TRBNode;
     TRBNode = record
@@ -25,6 +26,7 @@ Type
       rightmost: PRBNode;
       compareFunc: TCompareFunc;
       freehead,freetail:PRBNode;
+      Scavenger:TClearFunc;
       procedure RotateLeft(var x: PRBNode);
       procedure RotateRight(var x: PRBNode);
       function Minimum(var x: PRBNode): PRBNode;
@@ -34,7 +36,7 @@ Type
       function NewNode():PRBNode;
       procedure printTreeNode(n:PRBNode; offs:integer);
     public
-      constructor Create(Compare: TCompareFunc);
+      constructor Create(Compare: TCompareFunc=nil;lScavenger:TClearFunc=nil);
       destructor Destroy(); override;
       
       procedure Clear();
@@ -53,11 +55,11 @@ end;
 
 
 implementation
-
-constructor TCodaMinaRBTree.Create(Compare: TCompareFunc);
+constructor TCodaMinaRBTree.Create(Compare: TCompareFunc=nil;lScavenger:TClearFunc=nil);
 begin
   inherited Create;
   compareFunc := Compare;
+	Scavenger := lScavenger;
   root := nil;
   leftmost := nil;
   rightmost := nil;
@@ -75,6 +77,10 @@ begin
   x^.parent:=nil;
   x^.left:=nil;
   x^.color:=clBlack;
+	if Scavenger<>nil then
+	begin
+	  Scavenger(x^.K);
+	end;
   if freehead=nil then
   begin
     freehead:=x;
