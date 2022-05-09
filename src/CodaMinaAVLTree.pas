@@ -14,6 +14,7 @@ type
   generic TCodaMinaAVLTree<T> = class
   type
     Comp_func = function (a, b: T): Integer;
+		TClearFunc=procedure (value:T);
     PAVLNode = ^TAVLNode;
     TAVLNode = record
       Balance: Integer;
@@ -26,6 +27,7 @@ type
     FCount: Integer;
     Root: PAVLNode;
     cmp: Comp_func;
+		Scavenger:TClearFunc;
     freehead,freetail:PAVLNode;
     procedure BalanceAfterDelete(ANode: PAVLNode);
     procedure BalanceAfterInsert(ANode: PAVLNode);
@@ -39,19 +41,19 @@ type
     function FindSuccessor(ANode: PAVLNode): PAVLNode;
     procedure Delete(ANode: PAVLNode);
   public
-    constructor Create(c: Comp_func);
+    constructor Create(c: Comp_func;lScavenger:TClearFunc=nil);
     destructor Destroy; override;
     function Add(Data: T): PAVLNode;
     procedure Clear;
     function Find(Data: T): PAVLNode;
-    procedure delete(Data: T);
+    procedure Remove(Data: T);
     procedure printTree();
     property Count: Integer read FCount;
   end;
 
 implementation
 
-constructor TCodaMinaAVLTree.Create(c: Comp_func);
+constructor TCodaMinaAVLTree.Create(c: Comp_func;lScavenger:TClearFunc=nil);
 begin
   inherited Create;
   cmp := c;
@@ -59,6 +61,7 @@ begin
   Root := nil;
   freehead:=nil;
   freetail:=nil;
+	Scavenger:=lScavenger;
 end;
 
 destructor TCodaMinaAVLTree.Destroy;
@@ -72,6 +75,10 @@ begin
   x^.left:=nil;
   x^.Balance:=0;
   x^.Right:=nil;
+	if Scavenger<>nil then
+	begin
+	  Scavenger(x^.Data);
+	end;
   if freehead=nil then
   begin
     freehead:=x;
@@ -640,7 +647,7 @@ begin
   else
     Root := Successor;
   // delete Node as usual
-  DeleteNode(ANode);
+  Delete(ANode);
 end;
 
 function TCodaMinaAVLTree.Find(Data: T): PAVLNode;
@@ -727,13 +734,13 @@ begin
   end;
 end;
 
-procedure TCodaMinaAVLTree.delete(Data: T);
+procedure TCodaMinaAVLTree.Remove(Data: T);
 var
   ANode: PAVLNode;
 begin
   ANode := Find(Data);
   if ANode <> nil then
-    DeleteNode(ANode);
+    Delete(ANode);
 end;
 
 procedure TCodaMinaAVLTree.printTreeNode(n:PAVLNode; offs:integer);
