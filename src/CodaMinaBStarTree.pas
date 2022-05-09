@@ -16,6 +16,7 @@ type
 
   generic TCodaMinaBStarTree<TKEY,TVALUE>=class
     type
+           TClearFunc=procedure (value:TVALUE);
 	    ttree_cmp_func=function(key1, key2:TKEY):integer;
 	    pBNodeRec=^TBNodeRec;
 	    TBNodeRec=record
@@ -30,6 +31,7 @@ type
         root,freeNode:pBNodeRec;
         keys_per_node,twothird_keys_per_node,half_keys_per_node:integer;
         cmp_func:ttree_cmp_func;
+	Scavenger:TClearFunc;
 	    end;
     private
       BStarTree:TBStarTreeRec;
@@ -49,14 +51,14 @@ type
       procedure split2NodeInsertv2(n,n2,child,child2:pBNodeRec;var key:TKEY;var value:Tvalue);
       procedure printTreeNode(n:pBNodeRec;offs:integer);
     public
-      constructor create(cmpf:ttree_cmp_func;recordcount:integer;capacity:integer=10);
+      constructor create(cmpf:ttree_cmp_func;recordcount:integer;capacity:integer=10;lScavenger:TClearFunc=nil);
       function Find(key:TKEY):TVALUE;
       function delete(key:TKEY):boolean;
       function Add(key:TKEY;value:Tvalue):boolean;
       procedure printtree();
 	end;
 implementation
-constructor TCodaMinaBStarTree.create(cmpf:ttree_cmp_func;recordcount:integer;capacity:integer=10);
+constructor TGenericBStarTree.create(cmpf:ttree_cmp_func;recordcount:integer;capacity:integer=10;lScavenger:TClearFunc=nil);
 var
   i:integer;
   p:pBNodeRec;
@@ -69,6 +71,7 @@ begin
   BStarTree.twothird_keys_per_node := (recordcount * 2) div 3;
   BStarTree.half_keys_per_node:=recordcount div 2;
   BStarTree.cmp_func := cmpf;
+	BStarTree.Scavenger:=lScavenger;
   for i:=0 to capacity do
   begin
     p:=AllocMem(sizeof(TBNodeRec));
@@ -1503,10 +1506,22 @@ var
 begin
   n^.max:=0;
   n^.parent:=nil;
-  for i:=0 to length(n^.childs)-1 do
-  begin
-    n^.childs[i]:=nil;
-  end;
+	if BStarTree.Scavenger<>nil then
+	begin
+    for i:=0 to length(n^.childs)-1 do
+    begin
+      n^.childs[i]:=nil;
+			BStarTree.Scavenger(n^.data[i]);
+    end;
+	end
+	else
+	begin
+    for i:=0 to length(n^.childs)-1 do
+    begin
+      n^.childs[i]:=nil;
+    end;
+	end;
+
   if BStarTree.freeNode=nil then
   begin
     BStarTree.freeNode:=n;
