@@ -14,6 +14,7 @@ type
 
   generic TCodaMinaBTree<TKEY,TVALUE>=class
     type
+            TClearFunc=procedure (value:TVALUE);
 	    ttree_cmp_func=function(key1, key2:TKEY):integer;
 	    pBNodeRec=^TBNodeRec;
 	    TBNodeRec=record
@@ -28,6 +29,7 @@ type
         root,freeNode:pBNodeRec;
         keys_per_node,half_keys_per_node:integer;
         cmp_func:ttree_cmp_func;
+	Scavenger:TClearFunc;
 	    end;
     private
       btree:TBTreeRec;
@@ -41,14 +43,14 @@ type
       procedure rangeAppendToNode(frompos,topos:integer;nfrom,nto:pBNodeRec);
       procedure printTreeNode(n:pBNodeRec;offs:integer);
     public
-      constructor create(cmpf:ttree_cmp_func;recordcount:integer;capacity:integer=10);
+      constructor create(cmpf:ttree_cmp_func;recordcount:integer;capacity:integer=10;lScavenger:TClearFunc=nil);
       function Find(key:TKEY):TVALUE;
       function delete(key:TKEY):boolean;
       function Add(key:TKEY;value:Tvalue):boolean;
       procedure printtree();
 	end;
 implementation
-constructor TCodaMinaBTree.create(cmpf:ttree_cmp_func;recordcount:integer;capacity:integer=10);
+constructor TGenericBTree.create(cmpf:ttree_cmp_func;recordcount:integer;capacity:integer=10;lScavenger:TClearFunc=nil);
 var
   i:integer;
   p:pBNodeRec;
@@ -58,6 +60,7 @@ begin
   bTree.keys_per_node := recordcount;
   bTree.half_keys_per_node := recordcount div 2;
   bTree.cmp_func := cmpf;
+	bTree.Scavenger:=lScavenger;
   for i:=0 to capacity do
   begin
     p:=AllocMem(sizeof(TBNodeRec));
@@ -648,10 +651,22 @@ var
 begin
   n^.max:=0;
   n^.parent:=nil;
-  for i:=0 to length(n^.childs)-1 do
-  begin
-    n^.childs[i]:=nil;
-  end;
+	if btree.Scavenger<>nil then
+	begin
+    for i:=0 to length(n^.childs)-1 do
+    begin
+      n^.childs[i]:=nil;
+			btree.Scavenger(n^.data[i]);
+    end;
+	end
+	else
+	begin
+    for i:=0 to length(n^.childs)-1 do
+    begin
+      n^.childs[i]:=nil;
+    end;
+	end;
+
   if btree.freeNode=nil then
   begin
     btree.freeNode:=n;
