@@ -6,8 +6,8 @@ uses
   {$IFDEF UNIX}
   cthreads,
   {$ENDIF}
-  Classes, SysUtils,
-  CodaMinaHashMap,CodaMinaPriorityQueue,
+  Classes, SysUtils,math,
+  CodaMinaHashMap,CodaMinaPriorityQueue,CodaMinaNth_element,
   CodaMinaTTree,CodaMinaBTree,CodaMinaBPlusTree,CodaMinaBStarTree,CodaMinaSkipList2,CodaMinaLockFreeHashMap
   ,CodaMinaAVLTree,CodaMinaRBTree,CodaMinaQuadtree,CodaMinalockfreeQueue,genericCodaMinaSortableLink,genericCodaMinaSort;
 type
@@ -27,7 +27,39 @@ type
   ilfqueue= specialize TCodaMinalockfreeQueue<Integer>;
   ilinksort  = specialize TCodaMinaSortableLink<Integer>;
   iarraysort = specialize TCodaMinaArraySortFunction<Integer>;
-  TThreadQueue = class(TThread)
+  Tnth=specialize Tnth_element<Integer>;
+
+	TDistanceComparator=class
+	  private
+    base:PNameInfo;
+    n1:String;
+		public
+		constructor create(a: PNameInfo);
+    function cmp( a,b:PNameInfo ):Integer;
+		function check( b:PNameInfo ):Integer;
+	end;
+	constructor TDistanceComparator.create(a: PNameInfo);
+	begin
+	  base:=a;
+    setlength(n1,base^.namelen);
+    move(base^.name[0],n1[1],base^.namelen);
+	end;
+	function TDistanceComparator.check( b:PNameInfo ):Integer;
+	begin
+	  result:=b^.namelen;
+	end;
+  function TDistanceComparator.cmp( a,b:Pinteger ):Integer;
+	begin
+   if a^>b^ then
+   begin
+     result:=1;
+   end
+   else
+   begin
+     result:=0;
+   end;
+  end;
+TThreadQueue = class(TThread)
 private
   aqueue:ilfqueue;
   r:int32;
@@ -385,7 +417,20 @@ begin
   writeln(stdout,'tree search:',t.search( 3.0, 1.1));//result=3.0
   t.printtree();
 end;
-
+procedure nthtest();
+var
+  nth:Tnth;
+  A: array of Int32;
+begin
+  Randomize();
+  SetLength(A, 1000);
+  for I := 0 to 1000-1 do
+  begin
+    A[I] := RandomRange(1, 1001);
+  end;  
+  nth:=Tnth.Create;
+  nth.nth_element(@A[0],127,0,1000,@p.cmp);
+end;
 var
    i:integer;
    NTickInitial,NTickShowEnd: QWord;
@@ -394,6 +439,7 @@ var
    airbtree:irbtree;
    queuethread:TThreadQueue;
    lfqueue:ilfqueue;
+   
 begin
   randomize;
   NTickInitial:= GetTickCount64;
