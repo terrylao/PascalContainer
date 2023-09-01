@@ -14,7 +14,7 @@ SkipList,<br/>
 Sortable Single Linklist,<br/>
 Sort Function,<br/>
 LockFreeQueue.<br/>
-2023/08/28 加入: nth_element.<br/>
+2023/08/28 加入: nth_element. port from RUST version https://github.com/frjnn/floydrivest with fixed<br/>
 一個C++ 的類 STL nth_element, 有用到的人有用囉。 <br/>
 
 基本上都夠用的。<br/>
