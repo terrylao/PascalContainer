@@ -1,4 +1,7 @@
-
+{
+  publish with BSD Licence.
+	Copyright (c) Terry Lao
+}
 unit CodaMinaRBTree;
 {$mode objfpc}{$H+}
 interface
