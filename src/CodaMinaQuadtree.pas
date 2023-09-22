@@ -1,3 +1,7 @@
+{
+  publish with BSD Licence.
+	Copyright (c) Terry Lao
+}
 Unit CodaMinaQuadtree;
 interface
 
