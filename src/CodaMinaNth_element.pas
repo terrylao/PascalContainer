@@ -78,11 +78,11 @@ begin
   		inputArray[j] := t1;
       inc(i);
       dec(j);
-      while cmp(@inputArray[i], @t2) < 0 do
+      while (cmp(@inputArray[i], @t2) < 0 ) do
       begin
         inc(i);
       end;
-      while (cmp(@inputArray[j], @t2) > 0) and (j>=0) do
+      while (cmp(@inputArray[j], @t2) > 0)  do
       begin
         dec(j);
       end;
