@@ -23,7 +23,7 @@ implementation
 
 procedure TCodaMinaNth_element.nth_element(inputArray: PT; nth_el: int64;  left: int64;  right: int64; cmp: TCMP);
 var
-  i,j:Uint64;
+  i,j:int64;
   ll,rr:int64;
 	t1,t2:T;
 	n64,i64,z64,s64,sn64,sd64,isn64,inner64:double;
@@ -82,7 +82,7 @@ begin
       begin
         inc(i);
       end;
-      while cmp(@inputArray[j], @t2) > 0 do
+      while (cmp(@inputArray[j], @t2) > 0) and (j>=0) do
       begin
         dec(j);
       end;
