@@ -56,9 +56,6 @@ begin
       rr:= min(right, floor(inner64 + s64));
       nth_element(inputArray, nth_el, ll, rr, cmp);
     end;
-    // The following code partitions a[l : r] about t, it is similar to Hoare's
-    // algorithm but it'll run faster on most machines since the subscript range
-    // checking on i and j has been removed.
     i := left;
     j := right;
 		t2 := inputArray[nth_el];
@@ -78,11 +75,11 @@ begin
   		inputArray[j] := t1;
       inc(i);
       dec(j);
-      while (cmp(@inputArray[i], @t2) < 0 ) do
+      while (cmp(@inputArray[i], @t2) < 0 ) and (i<right) do
       begin
         inc(i);
       end;
-      while (cmp(@inputArray[j], @t2) > 0)  do
+      while (cmp(@inputArray[j], @t2) > 0) and (j>=0) do
       begin
         dec(j);
       end;
