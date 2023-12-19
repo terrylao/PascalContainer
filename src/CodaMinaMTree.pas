@@ -2,7 +2,7 @@
   publish with BSD Licence.
 	Copyright (c) Terry Lao
 }
-unit mtree;
+unit CodaMinaMTree;
 {$mode objfpc}{$H+}
 interface
 uses
@@ -139,7 +139,7 @@ type
 		procedure print(print:PrintNode);override;
 	end;
 			
-  generic TMTree<T> = class
+  generic TCodaMinaMTree<T> = class
 	type
 	  TEntry=specialize Entry<T>;
 		TMLeaf=specialize MLeaf<T>;
@@ -171,7 +171,7 @@ type
 		procedure PrintTree(aprint:TMNode.PrintNode);
 	end;
 
-procedure testmtree();
+procedure tesTCodaMinaMTree();
 
 implementation
 
@@ -593,10 +593,10 @@ begin
 	entries.clear();
 end;
 {*
- *  TMTree implementation code 
+ *  TCodaMinaMTree implementation code 
  *
  *}
-constructor TMTree.create( NROUTES, LEAFCAP:integer);
+constructor TCodaMinaMTree.create( NROUTES, LEAFCAP:integer);
 begin
   m_count:=0;
 	m_top:=nil;
@@ -606,7 +606,7 @@ end;
 
 
 
-procedure TMTree.promote(entries:TVecDBEntry; robj1, robj2:TRoute);
+procedure TCodaMinaMTree.promote(entries:TVecDBEntry; robj1, robj2:TRoute);
 var
   routes:array[0..1] of TRoute;
 	current,n_iters,i,j,maxpos,slimit:integer;
@@ -644,7 +644,7 @@ begin
 	routes[1].free;
 end;
 
-procedure TMTree.partition(entries:TVecDBEntry; robj1, robj2:TRoute; entries1, entries2:TVecDBEntry);
+procedure TCodaMinaMTree.partition(entries:TVecDBEntry; robj1, robj2:TRoute; entries1, entries2:TVecDBEntry);
 var
   radius1,radius2,d1,d2:int64;
 	i:integer;
@@ -674,7 +674,7 @@ begin
 	entries.clear();
 end;
 
-procedure TMTree.StoreEntries(leaf:TMLeaf; entries:TVecDBEntry);
+procedure TCodaMinaMTree.StoreEntries(leaf:TMLeaf; entries:TVecDBEntry);
 begin
 	while (not entries.empty()) do
 	begin
@@ -684,7 +684,7 @@ begin
 end;
 
 
-function TMTree.split(node:TMNode; const nobj:TEntry):TMNode;
+function TCodaMinaMTree.split(node:TMNode; const nobj:TEntry):TMNode;
 var
   leaf,leaf2:TMLeaf;
 	entries,entries1, entries2:TVecDBEntry;
@@ -766,7 +766,7 @@ begin
 end;
 
 
-procedure TMTree.Insert(const entry:TEntry);
+procedure TCodaMinaMTree.Insert(const entry:TEntry);
 var
   node:TMNode;
 	leaf:TMLeaf;
@@ -825,7 +825,7 @@ begin
 end;
 
 
-function TMTree.DeleteEntry(const entry:TEntry):integer;
+function TCodaMinaMTree.DeleteEntry(const entry:TEntry):integer;
 var
   node:TMNode;
 	count:integer;
@@ -860,7 +860,7 @@ begin
 end;
 
 
-procedure TMTree.Clear();
+procedure TCodaMinaMTree.Clear();
 var
   nodes:TQMNode;
 	current,child:TMNode;
@@ -874,7 +874,7 @@ begin
 
 	while (not nodes.IsEmpty()) do
 	begin
-		current := nodes.Top();
+		current := nodes.Front();
 		if current.NodeType=INTERNAL_NODE then
 		begin
 			internal := TMInternal(current);
@@ -903,7 +903,7 @@ begin
 end;
 
 
-function TMTree.RangeQuery(query:T; const radius:int64 ):TVecEntry;
+function TCodaMinaMTree.RangeQuery(query:T; const radius:int64 ):TVecEntry;
 var
   results:TVecEntry;
 	nodes:TQMNode;
@@ -918,7 +918,7 @@ begin
 
 	while (not nodes.isempty()) do
 	begin
-		current := nodes.Top();
+		current := nodes.Front();
 		if current.NodeType=INTERNAL_NODE then
 		begin
 			internal := TMInternal(current);
@@ -941,13 +941,13 @@ begin
 end;
 
 
-function TMTree.size():size_t;
+function TCodaMinaMTree.size():size_t;
 begin
 	result := m_count;
 end;
 
 
-function TMTree.memory_usage():size_t;
+function TCodaMinaMTree.memory_usage():size_t;
 var
 	nodes:TQMNode;
 	node,child:TMNode;
@@ -962,7 +962,7 @@ begin
 	n_entry := 0;
 	while (not nodes.isempty()) do
 	begin
-		node := nodes.top();
+		node := nodes.Front();
 		if node.NodeType=INTERNAL_NODE then
 		begin
 				inc(n_internal);
@@ -983,9 +983,9 @@ begin
 	end;
   nodes.free;
 	result := (n_internal*sizeof(TMInternal) + n_leaf*sizeof(TMLeaf)
-			+ m_count*sizeof(TDBEntry) + sizeof(TMTree));
+			+ m_count*sizeof(TDBEntry) + sizeof(TCodaMinaMTree));
 end;
-procedure TMTree.PrintTree(aprint:TMNode.PrintNode);
+procedure TCodaMinaMTree.PrintTree(aprint:TMNode.PrintNode);
 var
   nodes:TQMNode;
 	current,child:TMNode;
@@ -999,7 +999,7 @@ begin
 		nodes.Push(m_top);
 	while (not nodes.IsEmpty()) do
 	begin
-		current := nodes.Top();
+		current := nodes.Front();
 		if current.NodeType=INTERNAL_NODE then
 		begin
 			internal := TMInternal(current);
@@ -1039,13 +1039,13 @@ procedure print(const v:KeyObject);
 begin
   writeln(stdout,' KeyObject:',v.key);
 end;
-procedure testmtree();
+procedure tesTCodaMinaMTree();
 const nroutes:integer = 2;
       LEAFCAP:integer  = 10;
 type
   TEntryKey=specialize Entry<KeyObject>;
   TVecEntryKeyObject=specialize TCodaMinaVector<TEntryKey>;
-  myMTree=specialize TMTree<KeyObject>;
+  myMTree=specialize TCodaMinaMTree<KeyObject>;
   myRoute=specialize RoutingObject<KeyObject>;
   myDBEntry=specialize DBEntry<KeyObject>;
 
