@@ -17,6 +17,8 @@ LockFreeQueue.<br/>
 2023/08/28 加入: nth_element. port from RUST version https://github.com/frjnn/floydrivest with fixed<br/>
 一個C++ 的類 STL nth_element, 有用到的人有用囉。 <br/>
 2023/09/22 加入: M-tree. port from 一個非常漂亮的code [https://github.com/frjnn/floydrivest with fixed](https://github.com/starkdg/mtree)<br/>
+2023/12/19 加入: PDQSort. port from Orson Peters' PDQSort algorithm.<br/>
+                 PDQSort has problem in segmented sort an array, but its full array sort is faster than quicksort.<br/>
 <br/>
 
 基本上都夠用的。<br/>
@@ -26,7 +28,7 @@ Sort function 的測試：<br/>
 測試結果：DualPivotQuickSort 1680ms > quicksort3PivotBasic 1700ms > quicksort 1770ms > IterativequickSort 1800ms > mergesort 2260ms >  Iterativemergesort 3120ms。<br/>
 generic QuickSort 與非 generic 的慢約500ms ，<br/>
 非generic Quicksort 的 FPC 與 GCC 同樣開 -O3 ，FPC 慢約100ms。<br/>
-
+ 在1M Integer 的 PDQSort 比我的QuickSort 快最多50ms。<br/>
 
 
 
