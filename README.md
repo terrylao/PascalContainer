@@ -1,6 +1,6 @@
 # PascalContainer
 contributor: gcarreno  at github <br/>
-generic pascal data structure with <br/>
+fast and high performance generic data structure in freepascal: <br/>
 B-Tree,<br/>
 B+-Tree,<br/>
 B*-Tree,<br/>
