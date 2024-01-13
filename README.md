@@ -1,6 +1,5 @@
 # PascalContainer
-contributor: gcarreno  at github <br/>
-fast and high performance generic data structure in freepascal: <br/>
+high performance generic data structures and algorithms in freepascal.<br/>
 B-Tree,<br/>
 B+-Tree,<br/>
 B*-Tree,<br/>
@@ -20,6 +19,7 @@ LockFreeQueue.<br/>
 2023/12/19 加入: PDQSort. port from Orson Peters' PDQSort algorithm.<br/>
                  PDQSort has problem in segmented sort an array, but its full array sort is faster than quicksort.<br/>
 <br/>
+contributor: gcarreno  at github <br/>
 
 基本上都夠用的。<br/>
 Sort function 的測試：<br/>
