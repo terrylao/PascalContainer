@@ -15,7 +15,7 @@ Sort Function,<br/>
 LockFreeQueue.<br/>
 2023/08/28 加入: nth_element. port from RUST version https://github.com/frjnn/floydrivest with fixed<br/>
 一個C++ 的類 STL nth_element, 有用到的人有用囉。 <br/>
-2023/09/22 加入: M-tree. port from 一個非常漂亮的code [https://github.com/frjnn/floydrivest with fixed](https://github.com/starkdg/mtree)<br/>
+2023/09/22 加入: M-tree. port from 一個非常漂亮的code https://github.com/starkdg/mtree<br/>
 2023/12/19 加入: PDQSort. port from Orson Peters' PDQSort algorithm.<br/>
                  PDQSort has problem in segmented sort an array, but its full array sort is faster than quicksort.<br/>
 <br/>
