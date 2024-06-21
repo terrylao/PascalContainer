@@ -18,6 +18,7 @@ LockFreeQueue.<br/>
 2023/09/22 加入: M-tree. port from 一個非常漂亮的code https://github.com/starkdg/mtree<br/>
 2023/12/19 加入: PDQSort. port from Orson Peters' PDQSort algorithm.<br/>
                  PDQSort has problem in segmented sort an array, but its full array sort is faster than quicksort.<br/>
+2024/06/21 加入: C++ like 的vector，大概類似啦<br/>
 <br/>
 contributor: gcarreno  at github <br/>
 
