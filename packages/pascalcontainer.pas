@@ -11,7 +11,7 @@ uses
   CodaMinaAVLTree, CodaMinaBPlusTree, CodaMinaBStarTree, CodaMinaBTree, 
   CodaMinaHashMap, CodaMinaLockFreeHashMap, CodaMinalockfreeQueue, 
   CodaMinaPriorityQueue, CodaMinaQuadtree, CodaMinaRBTree, CodaMinaSkipList, 
-  CodaMinaSkipList2, CodaMinaTTree, genericCodaMinaSort, 
+  CodaMinaSkipList2, CodaMinaTTree, genericCodaMinaSort,CodaMinaMTree.pas, CodaMinaNth_element.pas,CodaMinaPDQSort.pas,CodaMinaVector.pas
   genericCodaMinaSortableLink, murmur3;
 
 implementation
