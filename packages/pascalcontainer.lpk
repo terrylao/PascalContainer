@@ -94,6 +94,10 @@
         <Filename Value="../src/CodaMinaVector.pas"/>
         <UnitName Value="CodaMinaVector"/>
       </Item20>
+      <Item21>
+        <Filename Value="../src/GenericCodaMinaHashSet.pas"/>
+        <UnitName Value="GenericCodaMinaHashSet"/>
+      </Item21>
     </Files>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>
