@@ -78,6 +78,18 @@
         <Filename Value="../src/murmur3.pas"/>
         <UnitName Value="murmur3"/>
       </Item16>
+      <Item17>
+        <Filename Value="../src/CodaMinaMTree.pas"/>
+        <UnitName Value="CodaMinaMTree"/>
+      </Item17>
+      <Item18>
+        <Filename Value="../src/CodaMinaNth_element.pas"/>
+        <UnitName Value="CodaMinaNth_element"/>
+      </Item18>
+      <Item19>
+        <Filename Value="../src/CodaMinaPDQSort.pas"/>
+        <UnitName Value="CodaMinaPDQSort"/>
+      </Item19>
     </Files>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>
