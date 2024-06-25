@@ -1,4 +1,4 @@
-Unit GenericCodaMinaHashSet;
+Unit CodaMinaHashSet;
 interface
 uses mymurmur3;
 const prime_1 = 73;
