@@ -95,8 +95,8 @@
         <UnitName Value="CodaMinaVector"/>
       </Item20>
       <Item21>
-        <Filename Value="../src/GenericCodaMinaHashSet.pas"/>
-        <UnitName Value="GenericCodaMinaHashSet"/>
+        <Filename Value="../src/CodaMinaHashSet.pas"/>
+        <UnitName Value="CodaMinaHashSet"/>
       </Item21>
     </Files>
     <UsageOptions>
