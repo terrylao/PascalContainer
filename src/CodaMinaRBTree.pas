@@ -77,6 +77,8 @@ begin
 end;
 procedure TCodaMinaRBTree.freeNode(x: PRBNode);
 begin
+  if x=nil then
+    exit;
   x^.parent:=nil;
   x^.left:=nil;
   x^.color:=clBlack;
