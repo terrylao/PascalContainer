@@ -71,6 +71,8 @@ begin
 end;
 procedure TCodaMinaAVLTree.freeNode(x: PAVLNode);
 begin
+  if x=nil then
+    exit;
   x^.parent:=nil;
   x^.left:=nil;
   x^.Balance:=0;
