@@ -17,7 +17,7 @@ type
       function contain(item:T):boolean;
       function remove(item:T):boolean;
       function add(item:T):boolean;
-      destructor destroy;
+      destructor destroy;override;
       function itemsCount():Integer;
       constructor create(caps:integer);
       procedure startIterate();
