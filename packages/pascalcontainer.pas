@@ -12,7 +12,7 @@ uses
   CodaMinaHashMap, CodaMinaLockFreeHashMap, CodaMinalockfreeQueue, 
   CodaMinaPriorityQueue, CodaMinaQuadtree, CodaMinaRBTree, CodaMinaSkipList, 
   CodaMinaSkipList2, CodaMinaTTree, genericCodaMinaSort,CodaMinaMTree.pas, CodaMinaNth_element.pas,CodaMinaPDQSort.pas,CodaMinaVector.pas
-  genericCodaMinaSortableLink, CodaMinaHashSet.pas, murmur3;
+  genericCodaMinaSortableLink, CodaMinaHashSet.pas, murmur3,CodaMinaArray;
 
 implementation
 
