@@ -19,6 +19,7 @@ LockFreeQueue.<br/>
 2023/12/19 加入: PDQSort. port from Orson Peters' PDQSort algorithm.<br/>
                  PDQSort has problem in segmented sort an array, but its full array sort is faster than quicksort.<br/>
 2024/06/21 加入: C++ like 的vector，大概類似啦<br/>
+2025/06/21 加入: CodaMinaArray 也是vector like 的，但沒有vector 省空間，但也沒有vector 的exception 問題。<br/>
 <br/>
 contributor: gcarreno  at github <br/>
 
