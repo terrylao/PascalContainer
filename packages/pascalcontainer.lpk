@@ -98,6 +98,10 @@
         <Filename Value="../src/CodaMinaHashSet.pas"/>
         <UnitName Value="CodaMinaHashSet"/>
       </Item21>
+      <Item22>
+        <Filename Value="../src/CodaMinaArray.pas"/>
+        <UnitName Value="CodaMinaArray"/>
+      </Item22>
     </Files>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>
